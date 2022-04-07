@@ -10,9 +10,9 @@ class Play
 public:
 	Play();
 
-	std::string transcribe(std::string Text);
+	int transcribe(std::string Text, std::string &mp3);
 
-	void login(const std::string& email, const std::string& password);
+	int login(const std::string& email, const std::string& password);
 
 private:
 	const std::string login_url_;

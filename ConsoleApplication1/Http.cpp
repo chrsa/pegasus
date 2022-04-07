@@ -2,10 +2,17 @@
 
 #include <curl/curl.h>
 #include <string>
+#include <stdexcept>
 
 Http::Http()
 {
-    curl_global_init(CURL_GLOBAL_ALL);
+    CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
+
+    /* Check for errors */
+    if (res != CURLE_OK) {
+        throw std::runtime_error(std::string("Http Module couldn't be initialized: ") + curl_easy_strerror(res));
+    }
+    
 }
 
 Http::~Http()
@@ -29,22 +36,12 @@ size_t Http::callback(void* ptr, size_t, size_t nmemb, void* userp)
     return nmemb;
 }
 
-std::string Http::request(const std::string &url, const std::string& Data)
+std::string Http::request(int &httpStatus, const std::string &url, const std::string& Data)
 {
     CURL* curl;
     CURLcode res = CURLE_OK;
 
     std::string writeData;
-
-
-
-    /* Check for errors */
-    if (res != CURLE_OK) {
-        fprintf(stderr, "curl_global_init() failed: %s\n",
-            curl_easy_strerror(res));
-        return "";
-    }
-
 
     /* get a curl handle */
     curl = curl_easy_init();
@@ -86,6 +83,8 @@ std::string Http::request(const std::string &url, const std::string& Data)
         if (res != CURLE_OK)
             fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
+
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpStatus);
 
         /* always cleanup */
         curl_easy_cleanup(curl);

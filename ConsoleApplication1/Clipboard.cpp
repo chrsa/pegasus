@@ -5,14 +5,22 @@
 
 std::string Clipboard::read()
 {
-    OpenClipboard(nullptr);
-    HANDLE hData = GetClipboardData(CF_TEXT);
+    std::string text;
 
-    char* pszText = static_cast<char*>(GlobalLock(hData));
-    std::string text(pszText);
-
-    GlobalUnlock(hData);
-    CloseClipboard();
+    if (OpenClipboard(NULL))
+    {
+        HANDLE hClipboardData = GetClipboardData(CF_TEXT);
+        if (hClipboardData)
+        {
+            CHAR* pchData = (CHAR*)GlobalLock(hClipboardData);
+            if (pchData)
+            {
+                text = pchData;
+                GlobalUnlock(hClipboardData);
+            }
+        }
+        CloseClipboard();
+    }
 
     return text;
 }
