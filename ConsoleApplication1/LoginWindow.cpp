@@ -1,5 +1,44 @@
 #include "LoginWindow.h"
 
+/*
+
+LRESULT CALLBACK LoginWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_CREATE:
+    {
+        CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
+        int* userdata = reinterpret_cast<int*>(pCreate->lpCreateParams);
+        SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)userdata);
+
+        Engine* engine = reinterpret_cast<Engine*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+        engine->loginWindow().setup(hWnd);
+        break;
+    }
+    case WM_COMMAND:
+    {
+        Engine* engine = reinterpret_cast<Engine*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+
+        if (HIWORD(wParam) == BN_CLICKED) {
+
+            char user[256];
+            GetWindowTextA(engine->loginWindow().userHandler(), user, sizeof(user));
+
+            char pass[256];
+            GetWindowTextA(engine->loginWindow().passHandler(), pass, sizeof(pass));
+
+            int status = engine->client_.play().login(user, pass);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+}
+
 void LoginWindow::create(HINSTANCE hInst, LPVOID data, WNDPROC proc)
 {
     const char* classname = "LoginWindow";
@@ -63,3 +102,6 @@ HWND LoginWindow::okHandler() const
 {
     return ok_;
 }
+
+
+*/

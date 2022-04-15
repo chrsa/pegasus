@@ -18,6 +18,8 @@ public:
 	HWND okHandler() const;
 
 private:
+	static LRESULT CALLBACK GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 
 	HWND window_;
 	HWND user_;

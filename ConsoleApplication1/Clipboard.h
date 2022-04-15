@@ -6,7 +6,11 @@ class Clipboard
 {
 public:
 
-	static std::string read();
+	std::string read();
+	std::string last();
+private:
+
+	std::string lastText_;
 
 };
 

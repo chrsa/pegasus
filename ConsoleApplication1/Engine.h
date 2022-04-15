@@ -2,8 +2,9 @@
 
 #include "Client.h"
 #include <Windows.h>
-#include "LoginWindow.h"
+//#include "LoginWindow.h"
 #include "MessageWindow.h"
+#include "MP3Player.h"
 
 class Engine
 {
@@ -14,18 +15,17 @@ public:
 
 	int loop(int cmdshow);
 
-	LoginWindow& loginWindow();
+	//LoginWindow& loginWindow();
 
 private:
 
-	static LRESULT CALLBACK MessageWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static void EngineCallBack(void*);
 
 	Client client_;
 	HWND myWindow_;
-	LoginWindow loginWindow_;
+//	LoginWindow loginWindow_;
 	MessageWindow messageWindow_;
-
-	static constexpr int IDT_TIMER1 = 1001;
+	MP3Player player_;
+	
 };
 

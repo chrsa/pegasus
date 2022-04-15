@@ -15,6 +15,8 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 {
     Engine engine{ hInst };
 
+    engine.login("christiano.sa@outlook.com", "PlayHt01");
+
     return engine.loop(cmdshow);
 }
 

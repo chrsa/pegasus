@@ -22,5 +22,13 @@ std::string Clipboard::read()
         CloseClipboard();
     }
 
+    lastText_ = text;
+
     return text;
+}
+
+
+std::string Clipboard::last()
+{
+    return lastText_;
 }
