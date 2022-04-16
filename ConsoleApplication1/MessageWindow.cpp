@@ -2,7 +2,7 @@
 
 
 
-LRESULT CALLBACK MessageWindow::MessageWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ClipboardMessageWindow::MessageWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
@@ -31,9 +31,13 @@ LRESULT CALLBACK MessageWindow::MessageWndProc(HWND hWnd, UINT uMsg, WPARAM wPar
         case IDT_TIMER1:
         {
             KillTimer(hWnd, IDT_TIMER1);
-            MessageWindow* messageOnly = reinterpret_cast<MessageWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-            messageOnly->clipBoardChanged_ = true;
-            messageOnly->callbackCall();
+            ClipboardMessageWindow* messageOnly = reinterpret_cast<ClipboardMessageWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+            
+            if (messageOnly->enabled_)
+            {
+                messageOnly->clipBoardChanged_ = true;
+                messageOnly->callbackCall();
+            }
 
             break;
         }
@@ -43,13 +47,13 @@ LRESULT CALLBACK MessageWindow::MessageWndProc(HWND hWnd, UINT uMsg, WPARAM wPar
         break;
     }
     default:
-        break;
+        return DefWindowProcA(hWnd, uMsg, wParam, lParam);
     }
 
-    return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+    return 0;
 }
 
-void MessageWindow::create(HINSTANCE hInst)
+void ClipboardMessageWindow::create(HINSTANCE hInst)
 {
     const char* classname = "MessageWindow";
 
@@ -67,38 +71,42 @@ void MessageWindow::create(HINSTANCE hInst)
 
 }
 
-HWND MessageWindow::handler() const
+HWND ClipboardMessageWindow::handler() const
 {
     return window_;
 }
 
 
-void MessageWindow::show(int cmdshow)
+void ClipboardMessageWindow::show(int cmdshow)
 {
     ShowWindow(window_, cmdshow);
 }
 
+void ClipboardMessageWindow::enable()
+{
+    enabled_ = true;
+}
 
+void ClipboardMessageWindow::disable()
+{
+    enabled_ = false;
+}
 
-MessageWindow::MessageWindow(void (*callback)(void*), void *obj)
+ClipboardMessageWindow::ClipboardMessageWindow(void (*callback)(void*), void *obj)
 : callback_ { callback }
 , callbackObj_{ obj }
 , clipBoardChanged_{false}
+, enabled_{false}
 {
 
 }
 
-void MessageWindow::callbackCall()
+void ClipboardMessageWindow::callbackCall()
 {
     callback_(callbackObj_);
 }
 
-
-bool MessageWindow::ClipBoardChanged()
+ClipboardMessageWindow::~ClipboardMessageWindow()
 {
-    bool clipBoardChanged = clipBoardChanged_;
-
-    clipBoardChanged_ = false;
-
-    return clipBoardChanged;
+    DestroyWindow(window_);
 }

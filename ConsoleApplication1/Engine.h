@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Client.h"
 #include <Windows.h>
 //#include "LoginWindow.h"
-#include "MessageWindow.h"
 #include "MP3Player.h"
+#include "Play.h"
+#include "Clipboard.h"
+#include "MainWindow.h"
+#include "LoginWindow.h"
 
 class Engine
 {
@@ -15,17 +17,20 @@ public:
 
 	int loop(int cmdshow);
 
-	//LoginWindow& loginWindow();
-
 private:
 
-	static void EngineCallBack(void*);
+	static void mainWindowCallBack(void*);
+	static void loginWindowCallBack(void*);
 
-	Client client_;
-	HWND myWindow_;
-//	LoginWindow loginWindow_;
-	MessageWindow messageWindow_;
+	Play play_;
+	Clipboard clipboard_;
+	
+	MainWindow mainWindow_;
+	LoginWindow loginWindow_;
+
 	MP3Player player_;
+
+	HINSTANCE hinst_;
 	
 };
 

@@ -1,11 +1,11 @@
 #pragma once
 #include <Windows.h>
 
-class MessageWindow
+class ClipboardMessageWindow
 {
 
 public:
-	MessageWindow( void (*callback)(void *), void *obj);
+	ClipboardMessageWindow( void (*callback)(void *), void *obj);
 
 	void create(HINSTANCE hInst);
 
@@ -14,6 +14,12 @@ public:
 	void show(int cmdshow);
 
 	bool ClipBoardChanged();
+
+	void enable();
+
+	void disable();
+
+	~ClipboardMessageWindow();
 
 private:
 
@@ -29,6 +35,8 @@ private:
 
 	void (*callback_)(void *);
 	void *callbackObj_;
+
+	bool enabled_;
 };
 
 

@@ -4,20 +4,35 @@
 #include <fstream>
 #include <iostream>
 
-void Engine::EngineCallBack(void* data)
+
+void Engine::loginWindowCallBack(void* data)
+{
+    Engine* engine = reinterpret_cast<Engine*>(data);
+
+    if (engine->login(engine->loginWindow_.getUsername(), engine->loginWindow_.getPassword()) != 200)
+    {
+        MessageBoxA(NULL, "Incorrect Username or Password.", "Error", MB_OK);
+        return;
+    }
+
+    engine->loginWindow_.hide();
+    engine->mainWindow_.show();
+}
+
+void Engine::mainWindowCallBack(void* data)
 {
     Engine* engine = reinterpret_cast<Engine *>( data);
 
-    if (engine->messageWindow_.ClipBoardChanged())
+    if (engine->mainWindow_.ClipBoardChanged())
     {
         engine->player_.stop();
-        std::string old = engine->client_.clipboard().last();
-        std::string newClipboard = engine->client_.clipboard().read();
+        std::string old = engine->clipboard_.last();
+        std::string newClipboard = engine->clipboard_.read();
 
         if (newClipboard != old)
         {
             std::string mp3;
-            int status = engine->client_.play().transcribe(newClipboard, mp3);
+            int status = engine->play_.transcribe(newClipboard, mp3);
             if (status != 200)
             {
                 return;
@@ -35,27 +50,26 @@ void Engine::EngineCallBack(void* data)
 }
 
 Engine::Engine(HINSTANCE hInst)
-: messageWindow_{ EngineCallBack, this }
+    : mainWindow_{ mainWindowCallBack , this, hInst }
+    , loginWindow_{ loginWindowCallBack , this, hInst }
 {
-    messageWindow_.create(hInst);
-    //loginWindow_.create(hInst);
+    
 }
 
 int Engine::login(const std::string &email, const std::string &password)
 {
-    return client_.play().login(email, password);
+    return play_.login(email, password);
 }
 
 
-int Engine::loop(int cmdshow)
+int Engine::loop( int cmdshow)
 {
-    //loginWindow_.show(cmdshow);
-    messageWindow_.show(cmdshow);
-
+    loginWindow_.show();
+ 
     MSG msg;
     BOOL bRet;
 
-    while ((bRet = GetMessageA(&msg, NULL, 0, 0)) != 0)
+    while ( (bRet = GetMessageA(&msg, NULL, 0, 0)) != 0)
     {
         if (bRet == -1)
         {
@@ -63,17 +77,13 @@ int Engine::loop(int cmdshow)
         }
         else
         {
-            TranslateMessage(&msg);
-            DispatchMessageA(&msg);
+            if (!msg.hwnd || !IsDialogMessageA(loginWindow_.windowHandler(), &msg)) {
+                TranslateMessage(&msg);
+                DispatchMessageA(&msg);
+            }
         }
     }
 
     return msg.wParam;
 }
 
-
-/*LoginWindow& Engine::loginWindow()
-{
-    return loginWindow_;
-}
-*/
