@@ -22,6 +22,8 @@ private:
 	static void mainWindowCallBack(void*);
 	static void loginWindowCallBack(void*);
 
+	static void TextToSpeech(Engine* engine, const std::string& input);
+
 	Play play_;
 	Clipboard clipboard_;
 	
@@ -31,6 +33,8 @@ private:
 	MP3Player player_;
 
 	HINSTANCE hinst_;
-	
+
+	std::string lastText_;
+	std::string lastVoice_;
 };
 

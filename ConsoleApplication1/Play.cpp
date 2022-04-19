@@ -17,7 +17,8 @@ int Play::transcribe(std::string Text, std::string &mp3)
 	std::replace(Text.begin(), Text.end(), '\a', ' ');
 
 
-	std::string postData = "{\"userId\":\"" + localId_ + "\",\"ssml\":\"<speak><p>" + Text + "</p></speak>\",\"voice\":\"en-US-ChristopherNeural\",\"narrationStyle\":\"regular\",\"globalSpeed\":\"100%\",\"globalVolume\":\"+0dB\",\"pronunciations\":[],\"platform\":\"dashboard\"}";
+	std::string postData = "{\"userId\":\"" + localId_ + "\",\"ssml\":\"<speak><p>" + Text;
+	postData += "</p></speak>\",\"voice\":\"" + voice_ + "\", \"narrationStyle\":\"regular\",\"globalSpeed\":\"100%\",\"globalVolume\":\"+0dB\",\"pronunciations\":[],\"platform\":\"dashboard\"}";
 
 	int httpStatus;
 
@@ -55,4 +56,9 @@ int Play::login(const std::string &email, const std::string &password)
 	}
 
 	return httpCode;
+}
+
+void Play::ConfigureVoice(const std::string& voice)
+{
+	voice_ = voice;
 }

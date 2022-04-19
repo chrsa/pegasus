@@ -61,6 +61,7 @@ LRESULT CALLBACK LoginWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 
         LoginWindow* loginWindow = reinterpret_cast<LoginWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
         loginWindow->setup(hWnd);
+
         break;
     }
     case WM_PAINT:
@@ -125,7 +126,7 @@ void LoginWindow::create(HINSTANCE hInst, LPVOID data, WNDPROC proc)
     window_ = CreateWindowExA(
         0,
         classname,
-        "PlayHt 1.0",
+        "Pegasus",
         WS_OVERLAPPEDWINDOW,
         xCtr, yCtr, width, height,
         NULL,       // Parent window    
@@ -133,9 +134,8 @@ void LoginWindow::create(HINSTANCE hInst, LPVOID data, WNDPROC proc)
         hInst,      // Instance handle
         data        // Additional application data
     );
-
-   
 }
+
 
 
 void LoginWindow::setup(HWND hwnd)

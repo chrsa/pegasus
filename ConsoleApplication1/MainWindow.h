@@ -11,11 +11,28 @@ public:
 	MainWindow(void (*callback)(void*), void* obj, HINSTANCE hInst);
 	bool ClipBoardChanged();
 
-	static void ClipboardNotificationCallback(void* data);
-
 	void show();
 
+	bool isPlayAutomatically() const;
+	bool PlayAutomaticallyChanged();
+
+	bool NewAudioCommand();
+
+	AudioCommand ReadAudioCommand() const;
+
+	const std::string& TextToSpeech() const;
+	bool NewTextToSpeechCommand();
+
+	void ShowMp3Buttons();
+
+	void HideMp3Buttons();
+
+	const std::string& Voice() const;
+
 private:
+
+	static void ClipboardNotificationCallback(void* data);
+	static void ControlWindowNotificationCallback(void* data);
 
 	void Invoke();
 
@@ -26,6 +43,10 @@ private:
 	void (*callback_)(void*);
 	void* callbackObj_;
 
-	bool enabled_;
+	bool playAutomaticallyChanged_;
+
+	bool newAudioCommand_;
+
+	bool textToSpeechCommand_;
 };
 

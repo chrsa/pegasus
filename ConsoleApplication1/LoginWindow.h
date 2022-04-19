@@ -37,8 +37,8 @@ private:
 	HWND pass_;
 	HWND ok_;
 	HBITMAP logo_;
-	HDC hdcSource_;
 
+	HDC hdcSource_;
 	HBRUSH hbrBkgnd_;
 
 	void (*callback_)(void*);

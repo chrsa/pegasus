@@ -25,28 +25,71 @@ void Engine::mainWindowCallBack(void* data)
 
     if (engine->mainWindow_.ClipBoardChanged())
     {
-        engine->player_.stop();
-        std::string old = engine->clipboard_.last();
-        std::string newClipboard = engine->clipboard_.read();
-
-        if (newClipboard != old)
+        TextToSpeech(engine, engine->clipboard_.read());
+    }
+    else if (engine->mainWindow_.PlayAutomaticallyChanged())
+    {
+        if (engine->mainWindow_.isPlayAutomatically())
         {
-            std::string mp3;
-            int status = engine->play_.transcribe(newClipboard, mp3);
-            if (status != 200)
-            {
-                return;
-            }
-
-            std::ofstream ofs{ "teste.mp3", std::ios::binary | std::ios_base::trunc };
-            ofs << mp3;
-            ofs.flush();
-            ofs.close();
+            engine->player_.enableAutomatic();
         }
-        
+        else
+        {
+            engine->player_.disableAutomatic();
+        }
+    }
+    else if (engine->mainWindow_.NewAudioCommand())
+    {
+        AudioCommand command = engine->mainWindow_.ReadAudioCommand();
 
+        if (command == AudioCommand::PLAY)
+        {
+            engine->player_.stop();
+            engine->player_.play();
+        }
+        else if (command == AudioCommand::STOP)
+        {
+            engine->player_.stop();
+        }
+    }
+    else if (engine->mainWindow_.NewTextToSpeechCommand())
+    {
+        TextToSpeech(engine, engine->mainWindow_.TextToSpeech());
+    }
+   
+}
+
+void Engine::TextToSpeech(Engine *engine, const std::string &input)
+{
+    engine->play_.ConfigureVoice(engine->mainWindow_.Voice());
+    engine->mainWindow_.HideMp3Buttons();
+    engine->player_.stop();
+    const std::string& TextToSpeech = input;
+    const std::string& Voice = engine->mainWindow_.Voice();
+    if (TextToSpeech != engine->lastText_ || Voice != engine->lastVoice_)
+    {
+        std::string mp3;
+        int status = engine->play_.transcribe(TextToSpeech, mp3);
+        if (status != 200)
+        {
+            return;
+        }
+
+        std::ofstream ofs{ "teste.mp3", std::ios::binary | std::ios_base::trunc };
+        ofs << mp3;
+        ofs.flush();
+        ofs.close();
+    }
+
+    engine->lastText_ = TextToSpeech;
+    engine->lastVoice_ = Voice;
+
+    if (engine->player_.automatic())
+    {
         engine->player_.play();
     }
+
+    engine->mainWindow_.ShowMp3Buttons();
 }
 
 Engine::Engine(HINSTANCE hInst)
