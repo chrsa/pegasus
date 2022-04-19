@@ -98,15 +98,15 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
         controlWindow->comboIdiom_ = CreateWindowExA(0, WC_COMBOBOXA, "",
             CBS_DROPDOWN | WS_CHILD | WS_VISIBLE,
-            20, 130, 200, 100, hWnd, (HMENU)5011, controlWindow->hInst_,
+            20, 150, 200, 100, hWnd, (HMENU)5011, controlWindow->hInst_,
             NULL);
         controlWindow->comboGenre_ = CreateWindowExA(WS_EX_WINDOWEDGE, WC_COMBOBOXA, "",
             CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
-            20, 160, 200, 100, hWnd, (HMENU)5012, controlWindow->hInst_,
+            20, 180, 200, 100, hWnd, (HMENU)5012, controlWindow->hInst_,
             NULL);
         controlWindow->comboVoiceType_ = CreateWindowExA(WS_EX_WINDOWEDGE, WC_COMBOBOXA, "",
             CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
-            20, 190, 200, 100, hWnd, (HMENU)5013, controlWindow->hInst_,
+            20, 210, 200, 100, hWnd, (HMENU)5013, controlWindow->hInst_,
             NULL);
         
         for (const auto elementI : controlWindow->voiceDb_.Voices())
@@ -134,8 +134,8 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
             "BUTTON",
             "Play",
             WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
-            300, 10,
-            250, 250,
+            300, 90,
+            250, 170,
             hWnd,
             (HMENU)5003,
             controlWindow->hInst_, NULL);
@@ -143,7 +143,7 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
             "BUTTON",
             "Play automatically",
             WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | WS_GROUP,  
-            310, 40,
+            310, 120,
             150, 20,
             hWnd,
             (HMENU)5004,
@@ -153,13 +153,13 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
         SendMessage(controlWindow->playAutomaticallyButton_, BM_SETCHECK, BST_CHECKED, 1);
 
         controlWindow->playButton_ = CreateWindowA("button", "Play", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-            310, 70, 80, 25, hWnd, (HMENU)5005, NULL, NULL);
+            310, 150, 80, 25, hWnd, (HMENU)5005, NULL, NULL);
 
         controlWindow->stopButton_ = CreateWindowA("button", "Stop", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-            310, 105, 80, 25, hWnd, (HMENU)5006, NULL, NULL);
+            310, 185, 80, 25, hWnd, (HMENU)5006, NULL, NULL);
 
         controlWindow->saveAsButton_ = CreateWindowA("button", "Save...", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-            310, 140, 80, 25, hWnd, (HMENU)5007, NULL, NULL);
+            310, 220, 80, 25, hWnd, (HMENU)5007, NULL, NULL);
 
         controlWindow->HideMp3Buttons();
 
@@ -168,7 +168,7 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
             "Text",
             WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
             10, 270,
-            540, 250,
+            540, 220,
             hWnd,
             (HMENU)5008,
             controlWindow->hInst_, NULL);
@@ -187,6 +187,17 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
         controlWindow->OkTextButton_ = CreateWindowA("button", "Ok", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
             220, 448, 80, 25, hWnd, (HMENU)5010, NULL, NULL);
+
+        break;
+    }
+    case WM_PAINT:
+    {
+        ControlWindow* controlWindow = reinterpret_cast<ControlWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+        PAINTSTRUCT ps;
+        HDC hdcDestination = BeginPaint(hWnd, &ps);
+        BitBlt(hdcDestination, 300, 0, 500, 500, controlWindow->hdcSource_, 0, 0, SRCCOPY);
+
+        EndPaint(hWnd, &ps);
 
         break;
     }
@@ -412,8 +423,8 @@ void ControlWindow::create(HINSTANCE hInst)
     wx.lpszClassName = classname;
     ATOM atom = RegisterClassExA(&wx);
 
-    int width = 580;
-    int height = 580;
+    int width = 575;
+    int height = 540;
 
     int screenX = GetSystemMetrics(SM_CXSCREEN);
     int screenY = GetSystemMetrics(SM_CYSCREEN);
@@ -433,6 +444,9 @@ void ControlWindow::create(HINSTANCE hInst)
         this        // Additional application data
     );
 
+    logo_ = (HBITMAP)LoadImageA(hInst_, "logo.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    hdcSource_ = CreateCompatibleDC(GetDC(0));
+    SelectObject(hdcSource_, logo_);
 
 }
 

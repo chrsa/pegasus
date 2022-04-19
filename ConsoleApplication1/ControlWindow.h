@@ -64,6 +64,7 @@ private:
 	void* callbackObj_;
 
 	HDC hdcSource_;
+	HBITMAP logo_;
 	HBRUSH hbrBkgnd_;
 
 	HWND window_;
