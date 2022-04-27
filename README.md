@@ -1,4 +1,4 @@
-# PLAY.HT CLIENT
+# Play.ht Windows Client
 
 This is a Windows-only open source PlayHt Gui Client.
 Features:
