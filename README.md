@@ -1,2 +1,5 @@
-# playhtguiclient
-PlayHt Gui Client
+# PLAY.HT CLIENT
+
+This is a open source PlayHt Gui Client.
+
+
