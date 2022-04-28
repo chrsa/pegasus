@@ -1,5 +1,7 @@
 # Play.ht Windows Client
 
+[Download for Windows 64bits](https://github.com/chrsa/playhtguiclient/releases/download/Release/PlayHt.zip)
+
 This is a Windows-only open source PlayHt Gui Client.
 Features:
 
