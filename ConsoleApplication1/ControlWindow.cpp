@@ -1,6 +1,6 @@
 #include "ControlWindow.h"
 #include <Windows.h>
-
+#include "Unicode.h"
 #include <Commctrl.h>
 
 ControlWindow::ControlWindow(void (*callback)(void*), void* obj, HINSTANCE hInst)
@@ -54,139 +54,139 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
     case WM_CREATE:
     {
         CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-        SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)pCreate->lpCreateParams);
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pCreate->lpCreateParams);
 
         ControlWindow* controlWindow = reinterpret_cast<ControlWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-        CreateWindowExA(WS_EX_WINDOWEDGE,
-            "BUTTON",
-            "Source",
+        CreateWindowEx(WS_EX_WINDOWEDGE,
+            L"BUTTON",
+            L"Source",
             WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
             10, 10,
             250, 100,
             hWnd,
-            (HMENU)5000,
+            (HMENU)NULL,
             controlWindow->hInst_, NULL);
-        CreateWindowExA(WS_EX_WINDOWEDGE,
-            "BUTTON",
-            "Clipboard",
+        CreateWindowEx(WS_EX_WINDOWEDGE,
+            L"BUTTON",
+            L"Clipboard",
             WS_VISIBLE | WS_CHILD | BS_AUTORADIOBUTTON | WS_GROUP, 
             20, 40,
             100, 20,
             hWnd, 
-            (HMENU)5001,
+            (HMENU)CLICK_RADIO_CLIPBOARD_ID,
             controlWindow->hInst_, NULL);
-        controlWindow->textButton_ = CreateWindowExA(WS_EX_WINDOWEDGE,
-            "BUTTON",
-            "Text",
+        controlWindow->textButton_ = CreateWindowEx(WS_EX_WINDOWEDGE,
+            L"BUTTON",
+            L"Text",
             WS_VISIBLE | WS_CHILD | BS_AUTORADIOBUTTON, 
             20, 60,
             100, 20,
             hWnd,
-            (HMENU)5002,
+            (HMENU)CLICK_RADIO_TEXT_ID,
             controlWindow->hInst_, NULL);
 
-        CreateWindowExA(WS_EX_WINDOWEDGE,
-            "BUTTON",
-            "Voice",
+        CreateWindowEx(WS_EX_WINDOWEDGE,
+            L"BUTTON",
+            L"Voice",
             WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
             10, 110,
             250, 150,
             hWnd,
-            (HMENU)5000,
+            (HMENU)NULL,
             controlWindow->hInst_, NULL);
 
-        controlWindow->comboIdiom_ = CreateWindowExA(0, WC_COMBOBOXA, "",
+        controlWindow->comboIdiom_ = CreateWindowEx(0, WC_COMBOBOX, L"",
             CBS_DROPDOWN | WS_CHILD | WS_VISIBLE,
-            20, 150, 200, 100, hWnd, (HMENU)5011, controlWindow->hInst_,
+            20, 150, 200, 100, hWnd, (HMENU)LANGUAGE_ID, controlWindow->hInst_,
             NULL);
-        controlWindow->comboGenre_ = CreateWindowExA(WS_EX_WINDOWEDGE, WC_COMBOBOXA, "",
+        controlWindow->comboGenre_ = CreateWindowEx(WS_EX_WINDOWEDGE, WC_COMBOBOX, L"",
             CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
-            20, 180, 200, 100, hWnd, (HMENU)5012, controlWindow->hInst_,
+            20, 180, 200, 100, hWnd, (HMENU)GENRE_ID, controlWindow->hInst_,
             NULL);
-        controlWindow->comboVoiceType_ = CreateWindowExA(WS_EX_WINDOWEDGE, WC_COMBOBOXA, "",
+        controlWindow->comboVoiceType_ = CreateWindowEx(WS_EX_WINDOWEDGE, WC_COMBOBOX, L"",
             CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
-            20, 210, 200, 100, hWnd, (HMENU)5013, controlWindow->hInst_,
+            20, 210, 200, 100, hWnd, (HMENU)VOICE_ID, controlWindow->hInst_,
             NULL);
         
         for (const auto elementI : controlWindow->voiceDb_.Voices())
         {
-            SendMessageA(controlWindow->comboIdiom_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)elementI.first.c_str());
+            SendMessage(controlWindow->comboIdiom_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)Unicode{}.utf8_decode(elementI.first).c_str());
         }
-        SendMessageA(controlWindow->comboIdiom_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+        SendMessage(controlWindow->comboIdiom_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
       
         for (const auto elementI : controlWindow->voiceDb_.Voices().begin()->second)
         {
-            SendMessageA(controlWindow->comboGenre_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)elementI.first.c_str());
+            SendMessage(controlWindow->comboGenre_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)Unicode {}.utf8_decode(elementI.first).c_str());
         }
-        SendMessageA(controlWindow->comboGenre_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+        SendMessage(controlWindow->comboGenre_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 
         for (const auto elementI : controlWindow->voiceDb_.Voices().begin()->second.begin()->second)
         {
-            SendMessageA(controlWindow->comboVoiceType_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)elementI.first.c_str());
+            SendMessage(controlWindow->comboVoiceType_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)Unicode {}.utf8_decode(elementI.first).c_str());
         }
-        SendMessageA(controlWindow->comboVoiceType_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+        SendMessage(controlWindow->comboVoiceType_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 
         controlWindow->voice_ = controlWindow->voiceDb_.Voices().begin()->second.begin()->second.begin()->second;
         
 
-        CreateWindowExA(WS_EX_WINDOWEDGE,
-            "BUTTON",
-            "Play",
+        CreateWindowEx(WS_EX_WINDOWEDGE,
+            L"BUTTON",
+            L"Play",
             WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
             300, 90,
             250, 170,
             hWnd,
-            (HMENU)5003,
+            (HMENU)NULL,
             controlWindow->hInst_, NULL);
-        controlWindow->playAutomaticallyButton_ = CreateWindowExA(WS_EX_WINDOWEDGE,
-            "BUTTON",
-            "Play automatically",
+        controlWindow->playAutomaticallyButton_ = CreateWindowEx(WS_EX_WINDOWEDGE,
+            L"BUTTON",
+            L"Play automatically",
             WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | WS_GROUP,  
             310, 120,
             150, 20,
             hWnd,
-            (HMENU)5004,
+            (HMENU)AUTOMATIC_ID,
             controlWindow->hInst_, NULL);
 
         SendMessage(controlWindow->textButton_, BM_SETCHECK, BST_CHECKED, 1);
         SendMessage(controlWindow->playAutomaticallyButton_, BM_SETCHECK, BST_CHECKED, 1);
 
-        controlWindow->playButton_ = CreateWindowA("button", "Play", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-            310, 150, 80, 25, hWnd, (HMENU)5005, NULL, NULL);
+        controlWindow->playButton_ = CreateWindow(L"button", L"Play", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+            310, 150, 80, 25, hWnd, (HMENU)AUDIO_PLAY_ID, NULL, NULL);
 
-        controlWindow->stopButton_ = CreateWindowA("button", "Stop", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-            310, 185, 80, 25, hWnd, (HMENU)5006, NULL, NULL);
+        controlWindow->stopButton_ = CreateWindow(L"button", L"Stop", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+            310, 185, 80, 25, hWnd, (HMENU)AUDIO_STOP_ID, NULL, NULL);
 
-        controlWindow->saveAsButton_ = CreateWindowA("button", "Save...", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-            310, 220, 80, 25, hWnd, (HMENU)5007, NULL, NULL);
+        controlWindow->saveAsButton_ = CreateWindow(L"button", L"Save...", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+            310, 220, 80, 25, hWnd, (HMENU)SAVE_AS_ID, NULL, NULL);
 
         controlWindow->HideMp3Buttons();
 
-        CreateWindowExA(WS_EX_WINDOWEDGE,
-            "BUTTON",
-            "Text",
+        CreateWindowEx(WS_EX_WINDOWEDGE,
+            L"BUTTON",
+            L"Text",
             WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
             10, 270,
             540, 220,
             hWnd,
-            (HMENU)5008,
+            (HMENU)NULL,
             controlWindow->hInst_, NULL);
 
 
-        controlWindow->Text_ = CreateWindowExA(
+        controlWindow->Text_ = CreateWindowEx(
             0,
-            "EDIT",
+            L"EDIT",
             NULL,
             WS_CHILD | WS_BORDER | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN,
             20, 290, 520, 150,
             hWnd,
-            (HMENU)5009,
+            (HMENU)NULL,
             controlWindow->hInst_,
             NULL);
 
-        controlWindow->OkTextButton_ = CreateWindowA("button", "Ok", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-            220, 448, 80, 25, hWnd, (HMENU)5010, NULL, NULL);
+        controlWindow->OkTextButton_ = CreateWindow(L"button", L"Ok", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+            220, 448, 80, 25, hWnd, (HMENU)OK_TEXT_ID, NULL, NULL);
 
         break;
     }
@@ -209,132 +209,143 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
         switch (controlId)
         {
-        case 5001:
+        case CLICK_RADIO_CLIPBOARD_ID:
         {
             controlWindow->clickRadio(SourceType::CLIPBOARD);
             EnableWindow(controlWindow->OkTextButton_, false);
             break;
         }
-        case 5002:
+        case CLICK_RADIO_TEXT_ID:
         {
             controlWindow->clickRadio(SourceType::TEXT);
             EnableWindow(controlWindow->OkTextButton_, true);
             break;
         }
-        case 5004:
+        case AUTOMATIC_ID:
         {
-            controlWindow->clickPlayAutomatically(IsDlgButtonChecked(hWnd, 5004));
+            controlWindow->clickPlayAutomatically(IsDlgButtonChecked(hWnd, AUTOMATIC_ID));
             break;
         }
-        case 5005:
+        case AUDIO_PLAY_ID:
         {
             controlWindow->clickAudioPlayCommand(AudioCommand::PLAY);
             break;
         }
-        case 5006:
+        case AUDIO_STOP_ID:
         {
             controlWindow->clickAudioPlayCommand(AudioCommand::STOP);
             break;
         }
-        case 5007:
+        case SAVE_AS_ID:
         {
-            OPENFILENAMEA openFileName = {};
-            ZeroMemory(&openFileName, sizeof(OPENFILENAMEA));
+            OPENFILENAME openFileName = {};
+            ZeroMemory(&openFileName, sizeof(OPENFILENAME));
             openFileName.lStructSize = sizeof(OPENFILENAME);
             openFileName.hwndOwner = nullptr;
-            char szFileName[MAX_PATH] = "";
-            openFileName.lpstrFilter = "Mp3 Files (*.mp3)\0*.mp3\0All Files (*.*)\0*.*\0";
+            wchar_t szFileName[MAX_PATH] = L"";
+            openFileName.lpstrFilter = L"Mp3 Files (*.mp3)\0*.mp3\0All Files (*.*)\0*.*\0";
             openFileName.lpstrFile = szFileName;
             openFileName.nMaxFile = MAX_PATH;
             openFileName.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR;
-            openFileName.lpstrDefExt = "mp3";
+            openFileName.lpstrDefExt = L"mp3";
 
 
-            if (GetSaveFileNameA(&openFileName))
+            if (GetSaveFileName(&openFileName))
             {
-                CopyFileA("teste.mp3", szFileName, false);
+                CopyFile(L"teste.mp3", szFileName, false);
             }
             break;
         }
-        case 5010:
+        case OK_TEXT_ID:
         {
-            int cTxtLen = GetWindowTextLengthA(controlWindow->Text_);
-            controlWindow->textStr_.resize(cTxtLen + 1);
+            std::wstring text;
 
-            int n = GetWindowTextA(controlWindow->Text_, &controlWindow->textStr_[0], cTxtLen + 1);
-            controlWindow->textStr_.resize(n);
+            int cTxtLen = GetWindowTextLength(controlWindow->Text_);
+            text.resize(2*(cTxtLen) + 1);
+            GetWindowText(controlWindow->Text_, &text[0], 2 * (cTxtLen)+1);
+            text.resize(wcslen(&text[0]));
+            controlWindow->textStr_ = Unicode{}.utf8_encode(text);
             controlWindow->clickTextCommand();
 
             break;
         }
-        case 5011:
+        case LANGUAGE_ID:
         {
             if (HIWORD(wParam) == CBN_SELCHANGE)
             {
-                int ItemIndex = SendMessageA((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-                char ListItem[256];
-                SendMessageA((HWND)lParam, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)ListItem);
 
-                SendDlgItemMessageA(hWnd, 5012, CB_RESETCONTENT, 0, 0);
-                for (const auto elementI : controlWindow->voiceDb_.Voices().at(ListItem))
+                int ItemIndex = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+                wchar_t ListItem[256];
+                SendMessage((HWND)lParam, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)ListItem);
+
+                std::string ListItemUtf8{ Unicode{}.utf8_encode(ListItem) };
+
+                SendDlgItemMessage(hWnd, GENRE_ID, CB_RESETCONTENT, 0, 0);
+                for (const auto elementI : controlWindow->voiceDb_.Voices().at(ListItemUtf8))
                 {
-                    SendMessageA(controlWindow->comboGenre_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)elementI.first.c_str());
+                    SendMessage(controlWindow->comboGenre_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)Unicode {}.utf8_decode(elementI.first).c_str());
                 }
-                SendMessageA(controlWindow->comboGenre_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+                SendMessage(controlWindow->comboGenre_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 
-                SendDlgItemMessageA(hWnd, 5013, CB_RESETCONTENT, 0, 0);
-                for (const auto elementI : controlWindow->voiceDb_.Voices().at(ListItem).begin()->second)
+                SendDlgItemMessage(hWnd, VOICE_ID, CB_RESETCONTENT, 0, 0);
+                for (const auto elementI : controlWindow->voiceDb_.Voices().at(ListItemUtf8).begin()->second)
                 {
-                    SendMessageA(controlWindow->comboVoiceType_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)elementI.first.c_str());
+                    SendMessage(controlWindow->comboVoiceType_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)Unicode {}.utf8_decode(elementI.first).c_str());
                 }
-                SendMessageA(controlWindow->comboVoiceType_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+                SendMessage(controlWindow->comboVoiceType_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 
-                controlWindow->voice_ = controlWindow->voiceDb_.Voices().at(ListItem).begin()->second.begin()->second;
+                controlWindow->voice_ = controlWindow->voiceDb_.Voices().at(ListItemUtf8).begin()->second.begin()->second;
                     
             }
             break;
 
         }
-        case 5012:
+        case GENRE_ID:
         {
             if (HIWORD(wParam) == CBN_SELCHANGE)
             {
-                int ItemIndex = SendMessageA(controlWindow->comboIdiom_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-                char Idiom[256];
-                SendMessageA((HWND)controlWindow->comboIdiom_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Idiom);
+                int ItemIndex = SendMessage(controlWindow->comboIdiom_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+                wchar_t Idiom[256];
+                SendMessage((HWND)controlWindow->comboIdiom_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Idiom);
+                std::string idiomUtf8{ Unicode{}.utf8_encode(Idiom) };
 
-                ItemIndex = SendMessageA((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-                char Genre[256];
-                SendMessageA((HWND)lParam, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Genre);
 
-                SendDlgItemMessageA(hWnd, 5013, CB_RESETCONTENT, 0, 0);
-                for (const auto elementI : controlWindow->voiceDb_.Voices().at(Idiom).at(Genre))
+                ItemIndex = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+                wchar_t Genre[256];
+                SendMessage((HWND)lParam, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Genre);
+                std::string genreUtf8{ Unicode{}.utf8_encode(Genre) };
+
+                SendDlgItemMessage(hWnd, VOICE_ID, CB_RESETCONTENT, 0, 0);
+                for (const auto elementI : controlWindow->voiceDb_.Voices().at(idiomUtf8).at(genreUtf8))
                 {
-                    SendMessageA(controlWindow->comboVoiceType_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)elementI.first.c_str());
+                    SendMessage(controlWindow->comboVoiceType_, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)Unicode {}.utf8_decode(elementI.first).c_str());
                 }
-                SendMessageA(controlWindow->comboVoiceType_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+                SendMessage(controlWindow->comboVoiceType_, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 
-                controlWindow->voice_ = controlWindow->voiceDb_.Voices().at(Idiom).at(Genre).begin()->second;
+                controlWindow->voice_ = controlWindow->voiceDb_.Voices().at(idiomUtf8).at(genreUtf8).begin()->second;
             }
             break;
         }
-        case 5013:
+        case VOICE_ID:
         {
             if (HIWORD(wParam) == CBN_SELCHANGE)
             {
-                int ItemIndex = SendMessageA(controlWindow->comboIdiom_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-                char Idiom[256];
-                SendMessageA((HWND)controlWindow->comboIdiom_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Idiom);
+                int ItemIndex = SendMessage(controlWindow->comboIdiom_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+                wchar_t Idiom[256];
+                SendMessage((HWND)controlWindow->comboIdiom_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Idiom);
+                std::string idiomUtf8{ Unicode{}.utf8_encode(Idiom) };
 
-                ItemIndex = SendMessageA((HWND)controlWindow->comboGenre_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-                char Genre[256];
-                SendMessageA((HWND)controlWindow->comboGenre_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Genre);
+                ItemIndex = SendMessage((HWND)controlWindow->comboGenre_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+                wchar_t Genre[256];
+                SendMessage((HWND)controlWindow->comboGenre_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Genre);
+                std::string genreUtf8{ Unicode{}.utf8_encode(Genre) };
 
-                ItemIndex = SendMessageA((HWND)controlWindow->comboVoiceType_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-                char Voice[256];
-                SendMessageA((HWND)controlWindow->comboVoiceType_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Voice);
+                ItemIndex = SendMessage((HWND)controlWindow->comboVoiceType_, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+                wchar_t Voice[256];
+                SendMessage((HWND)controlWindow->comboVoiceType_, (UINT)CB_GETLBTEXT, (WPARAM)ItemIndex, (LPARAM)Voice);
+                std::string voiceUtf8{ Unicode{}.utf8_encode(Voice) };
 
-                controlWindow->voice_ = controlWindow->voiceDb_.Voices().at(Idiom).at(Genre).at(Voice);
+                controlWindow->voice_ = controlWindow->voiceDb_.Voices().at(idiomUtf8).at(genreUtf8).at(voiceUtf8);
             }
             break;
         }
@@ -345,7 +356,7 @@ LRESULT CALLBACK ControlWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
     }
     default:
     {
-        return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+        return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
     }
 
@@ -413,15 +424,15 @@ void ControlWindow::Invoke()
 
 void ControlWindow::create(HINSTANCE hInst)
 {
-    const char* classname = "ControlWindow";
+    const wchar_t* classname = L"ControlWindow";
 
-    WNDCLASSEXA wx;
-    ZeroMemory(&wx, sizeof(WNDCLASSEXA));
-    wx.cbSize = sizeof(WNDCLASSEXA);
+    WNDCLASSEX wx;
+    ZeroMemory(&wx, sizeof(WNDCLASSEX));
+    wx.cbSize = sizeof(WNDCLASSEX);
     wx.lpfnWndProc = GUIWndProc;        // function which will handle messages
     wx.hInstance = hInst;
     wx.lpszClassName = classname;
-    ATOM atom = RegisterClassExA(&wx);
+    ATOM atom = RegisterClassEx(&wx);
 
     int width = 575;
     int height = 540;
@@ -432,10 +443,10 @@ void ControlWindow::create(HINSTANCE hInst)
     int xCtr = (screenX / 2) - (width / 2);
     int yCtr = (screenY / 2) - (height / 2);
 
-    window_ = CreateWindowExA(
+    window_ = CreateWindowEx(
         0,
         classname,
-        "Pegasus",
+        L"Pegasus",
         WS_OVERLAPPEDWINDOW,
         xCtr, yCtr, width, height,
         NULL,       // Parent window    
@@ -444,7 +455,7 @@ void ControlWindow::create(HINSTANCE hInst)
         this        // Additional application data
     );
 
-    logo_ = (HBITMAP)LoadImageA(hInst_, "logo.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    logo_ = (HBITMAP)LoadImage(hInst_, L"logo.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hdcSource_ = CreateCompatibleDC(GetDC(0));
     SelectObject(hdcSource_, logo_);
 

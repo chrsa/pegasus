@@ -11,7 +11,7 @@ void Engine::loginWindowCallBack(void* data)
 
     if (engine->login(engine->loginWindow_.getUsername(), engine->loginWindow_.getPassword()) != 200)
     {
-        MessageBoxA(NULL, "Incorrect Username or Password.", "Error", MB_OK);
+        MessageBox(NULL, L"Incorrect Username or Password.", L"Error", MB_OK);
         return;
     }
 
@@ -112,7 +112,7 @@ int Engine::loop( int cmdshow)
     MSG msg;
     BOOL bRet;
 
-    while ( (bRet = GetMessageA(&msg, NULL, 0, 0)) != 0)
+    while ( (bRet = GetMessage(&msg, NULL, 0, 0)) != 0)
     {
         if (bRet == -1)
         {
@@ -120,9 +120,9 @@ int Engine::loop( int cmdshow)
         }
         else
         {
-            if (!msg.hwnd || !IsDialogMessageA(loginWindow_.windowHandler(), &msg)) {
+            if (!msg.hwnd || !IsDialogMessage(loginWindow_.windowHandler(), &msg)) {
                 TranslateMessage(&msg);
-                DispatchMessageA(&msg);
+                DispatchMessage(&msg);
             }
         }
     }

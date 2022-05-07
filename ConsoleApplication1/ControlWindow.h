@@ -49,6 +49,17 @@ public:
 
 private:
 
+	static const int CLICK_RADIO_CLIPBOARD_ID = 5001;
+	static const int CLICK_RADIO_TEXT_ID = 5002;
+	static const int AUTOMATIC_ID = 5004;
+	static const int AUDIO_PLAY_ID = 5005;
+	static const int AUDIO_STOP_ID = 5006;
+	static const int SAVE_AS_ID = 5007;
+	static const int OK_TEXT_ID = 5010;
+	static const int LANGUAGE_ID = 5011;
+	static const int GENRE_ID = 5012;
+	static const int VOICE_ID = 5013;
+
 	void clickTextCommand();
 	void clickAudioPlayCommand(AudioCommand);
 

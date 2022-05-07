@@ -3,14 +3,14 @@
 
 void MP3Player::play()
 {
-	mciSendStringA("open teste.mp3 type mpegvideo alias myaudiofileplayht", NULL, 0, 0);
-	mciSendStringA("play myaudiofileplayht", NULL, 0, 0);
+	mciSendString(L"open teste.mp3 type mpegvideo alias myaudiofileplayht", NULL, 0, 0);
+	mciSendString(L"play myaudiofileplayht", NULL, 0, 0);
 }
 
 void MP3Player::stop()
 {
-	mciSendStringA("stop myaudiofileplayht", nullptr, 0, 0);
-	mciSendStringA("close myaudiofileplayht", nullptr, 0, 0);
+	mciSendString(L"stop myaudiofileplayht", nullptr, 0, 0);
+	mciSendString(L"close myaudiofileplayht", nullptr, 0, 0);
 }
 
 bool MP3Player::automatic() const

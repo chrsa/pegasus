@@ -19,7 +19,7 @@ LRESULT CALLBACK ClipboardMessageWindow::MessageWndProc(HWND hWnd, UINT uMsg, WP
     {
         CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
         int* userdata = reinterpret_cast<int*>(pCreate->lpCreateParams);
-        SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)userdata);
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)userdata);
 
         break;
     }
@@ -47,7 +47,7 @@ LRESULT CALLBACK ClipboardMessageWindow::MessageWndProc(HWND hWnd, UINT uMsg, WP
         break;
     }
     default:
-        return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+        return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
 
     return 0;
@@ -55,17 +55,17 @@ LRESULT CALLBACK ClipboardMessageWindow::MessageWndProc(HWND hWnd, UINT uMsg, WP
 
 void ClipboardMessageWindow::create(HINSTANCE hInst)
 {
-    const char* classname = "MessageWindow";
+    const wchar_t* classname = L"MessageWindow";
 
-    WNDCLASSEXA wx;
-    ZeroMemory(&wx, sizeof(WNDCLASSEXA));
-    wx.cbSize = sizeof(WNDCLASSEXA);
+    WNDCLASSEX wx;
+    ZeroMemory(&wx, sizeof(WNDCLASSEX));
+    wx.cbSize = sizeof(WNDCLASSEX);
     wx.lpfnWndProc = MessageWndProc;        // function which will handle messages
     wx.hInstance = hInst;
     wx.lpszClassName = classname;
-    ATOM atom = RegisterClassExA(&wx);
+    ATOM atom = RegisterClassEx(&wx);
 
-    window_ = CreateWindowExA(0, classname, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, hInst, this);
+    window_ = CreateWindowEx(0, classname, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, hInst, this);
 
     bool ok = AddClipboardFormatListener(window_);
 

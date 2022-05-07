@@ -1,4 +1,5 @@
 #include "LoginWindow.h"
+#include "Unicode.h"
 
 LoginWindow::LoginWindow(void (*callback)(void*), void* obj, HINSTANCE hInst)
 : callback_{ callback }
@@ -57,7 +58,7 @@ LRESULT CALLBACK LoginWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
     case WM_CREATE:
     {
         CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-        SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)pCreate->lpCreateParams);
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pCreate->lpCreateParams);
 
         LoginWindow* loginWindow = reinterpret_cast<LoginWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
         loginWindow->setup(hWnd);
@@ -81,21 +82,28 @@ LRESULT CALLBACK LoginWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 
         if (HIWORD(wParam) == BN_CLICKED) {
 
-            char user[256];
-            GetWindowTextA(loginWindow->userHandler(), user, sizeof(user));
+            std::wstring userStr;
+            std::wstring passStr;
 
-            char pass[256];
-            GetWindowTextA(loginWindow->passHandler(), pass, sizeof(pass));
+            int userLen = GetWindowTextLength(loginWindow->userHandler());
+            userStr.resize(2 * (userLen)+1);
+            GetWindowText(loginWindow->userHandler(), &userStr[0], 2 * (userLen)+1);
+            userStr.resize(wcslen(&userStr[0]));
 
-            loginWindow->userbox_ = user;
-            loginWindow->passwordbox_ = pass;
+            int passLen = GetWindowTextLength(loginWindow->passHandler());
+            passStr.resize(2 * (passLen)+1);
+            GetWindowText(loginWindow->passHandler(), &passStr[0], 2 * (passLen)+1);
+            passStr.resize(wcslen(&passStr[0]));
+
+            loginWindow->userbox_ = Unicode{}.utf8_encode(userStr);
+            loginWindow->passwordbox_ = Unicode{}.utf8_encode(passStr);
 
             loginWindow->Invoke();
         }
         break;
     }
     default:
-        return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+        return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
 
     return 0;
@@ -103,15 +111,15 @@ LRESULT CALLBACK LoginWindow::GUIWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 
 void LoginWindow::create(HINSTANCE hInst, LPVOID data, WNDPROC proc)
 {
-    const char* classname = "LoginWindow";
+    const wchar_t* classname = L"LoginWindow";
 
-    WNDCLASSEXA wx;
-    ZeroMemory(&wx, sizeof(WNDCLASSEXA));
-    wx.cbSize = sizeof(WNDCLASSEXA);
+    WNDCLASSEX wx;
+    ZeroMemory(&wx, sizeof(WNDCLASSEX));
+    wx.cbSize = sizeof(WNDCLASSEX);
     wx.lpfnWndProc = proc;        // function which will handle messages
     wx.hInstance = hInst;
     wx.lpszClassName = classname;
-    ATOM atom = RegisterClassExA(&wx);
+    ATOM atom = RegisterClassEx(&wx);
 
   
     int width = 400; 
@@ -123,10 +131,10 @@ void LoginWindow::create(HINSTANCE hInst, LPVOID data, WNDPROC proc)
     int xCtr = (screenX / 2) - (width / 2);
     int yCtr = (screenY / 2) - (height / 2);
 
-    window_ = CreateWindowExA(
+    window_ = CreateWindowEx(
         0,
         classname,
-        "Pegasus",
+        L"Pegasus",
         WS_OVERLAPPEDWINDOW,
         xCtr, yCtr, width, height,
         NULL,       // Parent window    
@@ -140,27 +148,26 @@ void LoginWindow::create(HINSTANCE hInst, LPVOID data, WNDPROC proc)
 
 void LoginWindow::setup(HWND hwnd)
 {
-    user_ = CreateWindowA("Edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP,
-        130, 100, 220, 20, hwnd, (HMENU)1002, NULL, NULL);
+    user_ = CreateWindow(L"Edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP,
+        130, 100, 220, 20, hwnd, (HMENU)NULL, NULL, NULL);
 
-    CreateWindowA("Static", "Username", WS_CHILD | WS_VISIBLE ,
-        50, 100, 80, 20, hwnd, (HMENU)1102, NULL, NULL);
+    CreateWindow(L"Static", L"Username", WS_CHILD | WS_VISIBLE ,
+        50, 100, 80, 20, hwnd, (HMENU)NULL, NULL, NULL);
 
-    pass_ = CreateWindowA("Edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_PASSWORD | WS_TABSTOP,
-        130, 150, 220, 20, hwnd, (HMENU)1003, NULL, NULL);
+    pass_ = CreateWindow(L"Edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_PASSWORD | WS_TABSTOP,
+        130, 150, 220, 20, hwnd, (HMENU)NULL, NULL, NULL);
 
-    CreateWindowA("Static", "Password", WS_CHILD | WS_VISIBLE ,
-        50, 150, 80, 20, hwnd, (HMENU)1103, NULL, NULL);
+    CreateWindow(L"Static", L"Password", WS_CHILD | WS_VISIBLE ,
+        50, 150, 80, 20, hwnd, (HMENU)NULL, NULL, NULL);
 
-    ok_ = CreateWindowA("button", "Ok", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-        160, 200, 80, 25, hwnd, (HMENU)1004, NULL, NULL); 
+    ok_ = CreateWindow(L"button", L"Ok", WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+        160, 200, 80, 25, hwnd, (HMENU)NULL, NULL, NULL);
 
   
     
-    logo_ = (HBITMAP)LoadImageA(hInst_, "logo.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    logo_ = (HBITMAP)LoadImage(hInst_, L"logo.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hdcSource_ = CreateCompatibleDC(GetDC(0));
     SelectObject(hdcSource_, logo_);
-
 
 }
 
